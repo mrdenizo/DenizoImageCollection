@@ -1,0 +1,22 @@
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="./css/bootsrap/bootstrap.min.css">
+    <link rel="stylesheet" href="./css/autocomplete.css">
+    <link rel="stylesheet" href="./css/FontsOverride.css">
+    <script type="module" src="./js/search.js" defer></script>
+</head>
+<body>
+    <div class="h-100 d-flex flex-column justify-content-center align-items-center">
+        <div>
+            <p class="mb-0">welcome to</p>
+            <h2>Denizo's image collection</h2>
+        </div>
+        <form class="d-flex" method="get" action="/images">
+            <input type="text" name="search" id="search" class="form-control" placeholder="Search whatever you want" autocomplete="off">
+            <button type="submit" class="btn btn-primary mx-2">Search</button>
+        </form>
+        <p>Or <a href="/upload">Upload an image</a></p>
+        <p>This website is licensed under <a href="/licence">MIT License</a>.</p>
+    </div>
+</body>

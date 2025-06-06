@@ -1,0 +1,18 @@
+{
+  "name": "denizoimagecollection",
+  "version": "1.0.0",
+  "description": "simple website for storing and searching images by tags",
+  "main": "./index.js",
+  "author": "mrdenizo",
+  "license": "MIT",
+  "scripts": {
+    "start": "node ./index.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.9.1",
+    "express": "^4.21.2",
+    "express-fileupload": "^1.5.1",
+    "hashids": "^2.3.0",
+    "hbs": "^4.2.0"
+  }
+}

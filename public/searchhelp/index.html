@@ -1,0 +1,49 @@
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="../css/bootsrap/bootstrap.min.css">
+    <link rel="stylesheet" href="../css/autocomplete_posts.css">
+    <link rel="stylesheet" href="../css/FontsOverride.css">
+    <link rel="stylesheet" href="../css/sidebar.css">
+    <script type="module" src="../js/search.js" defer></script>
+</head>
+<body>
+    <div class="h-100 d-flex flex-row justify-content-center align-items-center">
+        <div class="h-100 d-flex flex-column justify-content-start align-items-center p-3 sidebar">
+            <h5><a href="/" class="hide">Denizo's image collection</a></h5>
+            <form class="d-flex flex-column" method="get" action="/images">
+                <label for="search">Search</label>
+                <input type="text" name="search" id="search" class="form-control mb-2" placeholder="Search whatever you want" autocomplete="off">
+                <button type="submit" class="btn btn-primary mx-2">Search</button>
+            </form>
+            <a class="mt-2" href="/upload">Upload an image</a>
+        </div>
+        <div class="h-100 d-flex flex-column flex-grow-1">
+            <div class="flex-grow-1 p-4">
+                <h6>Search cheat sheet</h6>
+                <ul>
+                    <li>
+                        <p class="mb-0" style="font-weight: bold;">tag1 tag2</p>
+                        <p>Search ulpoads that contain tag1 <span style="font-weight: bold;">and</span> tag2</p>
+                    </li>
+                    <li>
+                        <p class="mb-0" style="font-weight: bold;">uid:foo</p>
+                        <p>Search upload with unique id of <span style="font-weight: bold;">foo</span></p>
+                    </li>
+                    <li>
+                        <p class="mb-0" style="font-weight: bold;">tag:foo</p>
+                        <p>Search uploads that <span style="font-weight: bold;">only contain</span> tag foo.</p>
+                    </li>
+                    <li>
+                        <p class="mb-0" style="font-weight: bold;">tag1 -tag2</p>
+                        <p>Search uploads <span style="font-weight: bold;">without</span> tag2</p>
+                    </li>
+                    <li>
+                        <p class="mb-0" style="font-weight: bold;">Star symbol '*'</p>
+                        <p>View all images unsorted</p>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>

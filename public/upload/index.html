@@ -1,0 +1,46 @@
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="../css/bootsrap/bootstrap.min.css">
+    <link rel="stylesheet" href="../css/autocomplete_posts.css">
+    <link rel="stylesheet" href="../css/FontsOverride.css">
+    <link rel="stylesheet" href="../css/sidebar.css">
+    <script type="module" src="../js/search.js" defer></script>
+    <script type="module" src="../js/uploadform.js" defer></script>
+</head>
+<body>
+    <div class="h-100 d-flex flex-row justify-content-center align-items-center">
+        <div class="h-100 d-flex flex-column justify-content-start align-items-center p-3 sidebar">
+            <h5><a href="/" class="hide">Denizo's image collection</a></h5>
+            <form class="d-flex flex-column" method="get" action="/images">
+                <label for="search">Search</label>
+                <input type="text" name="search" id="search" class="form-control mb-2" placeholder="Search whatever you want" autocomplete="off">
+                <button type="submit" class="btn btn-primary mx-2">Search</button>
+            </form>
+            <a href="/searchhelp">Search cheat sheet</a>
+        </div>
+        <div class="h-100 d-flex flex-column flex-grow-1 pt-3">
+            <div class="d-flex flex-column" style="max-width: 18rem;">
+                <form id="uploadform" class="d-flex flex-column" method="post" action="/api/v1/uploadfile" enctype="multipart/form-data">
+                    <label for="tagsinput" class="form-label">Image tags</label>
+                    <input type="text" class="form-control" id="tagsinput" name="tags" placeholder="for example: 'tag1 tag2'" autocomplete="off" required>
+                    <div id="tagsHelp" class="form-text">Add image tags separated with spaces.</div>
+                    <div id="tagsErrorMsg" class="text-danger form-text d-none">Tags should not be empty or whitespaces.</div>
+                    <label for="imagefile" class="form-label">Please select image</label>
+                    <input class="form-control overflow-hidden" type="file" accept=".png,.jpg,.gif,.webp" id="imagefile" name="image" required>
+                    <button type="submit" class="btn btn-primary mt-2">Upload</button>
+                </form>
+                <div class="alert alert-primary" role="alert">
+                    <p>Before uploading an image please <a href="/guidelines" style="font-style: italic;">read our guidelines</a>.</p>
+                    <p>Shortened version goes here:</p>
+                    <ul>
+                        <li>Uploaded file must be an image (obviously)</li>
+                        <li>Image must be properly tagged</li>
+                        <li>Image must be SFW (Safe For Work)</li>
+                        <li>If uploaded image breaks the rules it <span style="font-weight: bold;">will be removed</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>

@@ -1,0 +1,48 @@
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="./css/bootsrap/bootstrap.min.css">
+    <link rel="stylesheet" href="./css/autocomplete_posts.css">
+    <link rel="stylesheet" href="./css/FontsOverride.css">
+    <link rel="stylesheet" href="./css/sidebar.css">
+    <script type="module" src="./js/search.js" defer></script>
+</head>
+<body>
+    <div class="h-100 d-flex flex-row justify-content-center align-items-center">
+        <div class="h-100 d-flex flex-column justify-content-start align-items-center p-3 sidebar">
+            <h5><a href="/" class="hide">Denizo's image collection</a></h5>
+            <form class="d-flex flex-column" method="get" action="/images">
+                <label for="search">Search</label>
+                <input type="text" name="search" id="search" class="form-control mb-2" placeholder="Search whatever you want" autocomplete="off" value="{{searchedtext}}">
+                <button type="submit" class="btn btn-primary mx-2">Search</button>
+            </form>
+            <a href="/searchhelp">Search cheat sheet</a>
+            <a class="mt-2" href="/upload">Upload an image</a>
+        </div>
+        <div class="h-100 d-flex flex-column flex-grow-1">
+            <div class="d-flex flex-row flex-grow-1 flex-wrap align-content-start justify-content-start">
+                {{#each images}}
+                    <a href="{{this.url}}" class="d-flex justify-content-center align-items-center m-2" style="width: 200px; height: 200px;"><img style="max-width: 200px; max-height: 200px;" src="{{this.imageurl}}"></a>
+                {{/each}}
+            </div>
+            <div class="d-flex align-self-center">
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination">
+                        <li class="page-item {{#if pagebuttons.isfirst}}disabled{{/if}}"><a class="page-link" href="/images?search={{searchedtext}}&page=0">«</a></li>
+                        <li class="page-item {{#if pagebuttons.isfirst}}disabled{{/if}}"><a class="page-link" href="/images?search={{searchedtext}}&page={{pagebuttons.back}}">‹</a></li>
+                        {{#each orderedbuttons}}
+                            <li class="page-item"><a class="page-link {{#if this.isActive}}active{{/if}}" href="/images?search={{this.searchedtext}}&page={{this.count}}">{{this.count}}</a></li>
+                        {{/each}}
+                        <li class="page-item {{#if pagebuttons.islast}}disabled{{/if}}"><a class="page-link" href="/images?search={{searchedtext}}&page={{pagebuttons.next}}">›</a></li>
+                        <li class="page-item {{#if pagebuttons.islast}}disabled{{/if}}"><a class="page-link" href="/images?search={{searchedtext}}&page={{pagebuttons.last}}">»</a></li>
+                    </ul>
+                </nav>
+                <form method="get" class="d-flex" action="/images">
+                    <input type="text" name="search" class="d-none" autocomplete="off" value="{{searchedtext}}">
+                    <input type="text" name="page" id="page" class="form-control ms-1 me-0" placeholder="page..." autocomplete="off" style="max-width: 75px;">
+                    <button type="submit" class="btn btn-primary mx-1">go</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>

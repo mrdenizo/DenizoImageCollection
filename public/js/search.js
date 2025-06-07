@@ -19,21 +19,6 @@ document.querySelector("#search").addEventListener("input", (e) => {
         }
         Autocomplete.getInstance(document.querySelector('#search'))._addItems(items);
     }); 
-    
-    
-    
-    /*axios.post('/api/v1/gettags', {tag: document.querySelector("#search").value})
-    .then(function (res) {
-        let items = [];
-        Autocomplete.getInstance(document.querySelector('#search'))._items = [];
-        for(let tag of res.data) {
-            items.push(tag.tag);
-        }
-        Autocomplete.getInstance(document.querySelector('#search'))._addItems(items);
-    })
-    .catch(function(err) {
-
-    });*/
 });
 
 Autocomplete.init(`#search`, options);

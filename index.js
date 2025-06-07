@@ -45,7 +45,7 @@ const hid = new hashids(salt, 25);
 
 app.set('view engine', 'hbs');
 app.use(express.static('./public'));
-app.use('/storage', express.static('./storage'));
+//app.use('/storage', express.static('./storage'));
 app.use(fileupload({ useTempFiles: true, tempFileDir: './temp' }));
 app.use(express.json());
 
@@ -90,7 +90,7 @@ app.post('/api/v1/uploadfile', function(req, res) {
         for(let tag of req.body.tags.trim().toLowerCase().split(/\s+/)) {
             db.prepare('insert into tags(tag, ref_id) values(?, ?)').run(encodeURIComponent(tag), imageid.id);
         }
-        req.files.image.mv('./storage/' + hid.encode(imageid.id) + '.' + req.files.image.name.split('.').pop());
+        req.files.image.mv('./storage/' + imageid.id + '.' + req.files.image.name.split('.').pop());
 
         res.redirect('/view?uid=' + hid.encode(imageid.id));
     });
@@ -225,6 +225,20 @@ app.get('/view', function(req, res) {
         uid: req.query.uid,
         tags: tags,
         filename: filename
+    });
+});
+app.get('/storage/:uid', function(req, res) {
+    let fileuid = hid.decode(req.params.uid.slice(0, 25));
+    if(fs.existsSync('./storage/' + fileuid + req.params.uid.substring(25))) {
+        res.writeHead(200, {
+            "Content-Type": "image/jpeg",
+            "Content-Disposition": "inline; filename=\"" + req.params.uid.slice(0, 25) + req.params.uid.substring(25) + "\""
+        });
+        fs.createReadStream('./storage/' + fileuid + req.params.uid.substring(25)).pipe(res);
+        return;
+    }
+    res.render('notfound.hbs', {
+        url: req.path
     });
 });
 

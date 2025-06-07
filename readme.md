@@ -12,7 +12,7 @@ Simple website written in Node.js for storing and searching images by tags.
 ```
 Browse `http://localhost:13000` after running `npm start`.
 
-## Known issues
+## Troubleshooting
 
 ### Problem with installing `better-sqlite3` on Arch Linux and MacOS.
 

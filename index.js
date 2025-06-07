@@ -34,7 +34,7 @@ if(conf != undefined) {
     salt = conf['salt'];
 }
 else {
-    db.exec(`insert into configuration(salt, port) values('${crypto.createHash('md5').update(Date.now().toString()).digest('hex')}','13000')`);
+    db.prepare('insert into configuration(salt, port) values(?, ?)').run(crypto.createHash('md5').update(Date.now().toString()).digest('hex'), 13000);
     conf = loadConf.get();
     port = conf['port'];
     salt = conf['salt'];
@@ -85,7 +85,7 @@ app.post('/api/v1/uploadfile', function(req, res) {
     
     let imageid = db.prepare(`insert into images default values returning id`).get();
 
-    db.exec(`update images set filename = '${hid.encode(imageid.id) + '.' + req.files.image.name.split('.').pop()}' where id = ${imageid.id};`);
+    db.prepare(`update images set filename = ? where id = ?`).run(hid.encode(imageid.id) + '.' + req.files.image.name.split('.').pop(), imageid.id);
     
     for(let tag of req.body.tags.trim().toLowerCase().split(/\s+/)) {
         db.prepare('insert into tags(tag, ref_id) values(?, ?)').run(encodeURIComponent(tag), imageid.id);

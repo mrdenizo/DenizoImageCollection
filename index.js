@@ -82,16 +82,19 @@ app.post('/api/v1/uploadfile', function(req, res) {
         return;
     }
 
-    
-    let imageid = db.prepare(`insert into images default values returning id`).get();
+    let transaction = db.transaction(() => {
+        let imageid = db.prepare(`insert into images default values returning id`).get();
 
-    db.prepare(`update images set filename = ? where id = ?`).run(hid.encode(imageid.id) + '.' + req.files.image.name.split('.').pop(), imageid.id);
+        db.prepare(`update images set filename = ? where id = ?`).run(hid.encode(imageid.id) + '.' + req.files.image.name.split('.').pop(), imageid.id);
     
-    for(let tag of req.body.tags.trim().toLowerCase().split(/\s+/)) {
-        db.prepare('insert into tags(tag, ref_id) values(?, ?)').run(encodeURIComponent(tag), imageid.id);
-    }
-    req.files.image.mv('./storage/' + hid.encode(imageid.id) + '.' + req.files.image.name.split('.').pop());
-    res.redirect('/view?uid=' + hid.encode(imageid.id));
+        for(let tag of req.body.tags.trim().toLowerCase().split(/\s+/)) {
+            db.prepare('insert into tags(tag, ref_id) values(?, ?)').run(encodeURIComponent(tag), imageid.id);
+        }
+        req.files.image.mv('./storage/' + hid.encode(imageid.id) + '.' + req.files.image.name.split('.').pop());
+
+        res.redirect('/view?uid=' + hid.encode(imageid.id));
+    });
+    transaction.apply();
 });
 app.post('/api/v1/gettags', function(req, res) {
     if(!req.body) {

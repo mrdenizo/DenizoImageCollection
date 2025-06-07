@@ -45,7 +45,6 @@ const hid = new hashids(salt, 25);
 
 app.set('view engine', 'hbs');
 app.use(express.static('./public'));
-//app.use('/storage', express.static('./storage'));
 app.use(fileupload({ useTempFiles: true, tempFileDir: './temp' }));
 app.use(express.json());
 
@@ -229,6 +228,12 @@ app.get('/view', function(req, res) {
 });
 app.get('/storage/:uid', function(req, res) {
     let fileuid = hid.decode(req.params.uid.slice(0, 25));
+    if(fileuid.length === 0) {
+        res.render('notfound.hbs', {
+            url: req.path
+        });
+        return;
+    }
     if(fs.existsSync('./storage/' + fileuid + req.params.uid.substring(25))) {
         res.writeHead(200, {
             "Content-Type": "image/jpeg",

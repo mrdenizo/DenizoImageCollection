@@ -4,6 +4,7 @@ const hashids = require('hashids');
 const crypto = require('crypto');
 const fileupload = require('express-fileupload');
 const fs = require('fs');
+const sharp = require('sharp');
 
 
 if(!fs.existsSync('./storage')) {
@@ -80,20 +81,26 @@ app.post('/api/v1/uploadfile', function(req, res) {
         res.send(`400: bad request body.`);
         return;
     }
-
-    let transaction = db.transaction(() => {
-        let imageid = db.prepare(`insert into images default values returning id`).get();
-
-        db.prepare(`update images set filename = ? where id = ?`).run(hid.encode(imageid.id) + '.' + req.files.image.name.split('.').pop(), imageid.id);
-    
+    let imageid = db.prepare(`insert into images default values returning id`).get();
+    db.prepare(`update images set filename = ? where id = ?`).run(hid.encode(imageid.id) + '.' + req.files.image.name.split('.').pop(), imageid.id);
+        
+    req.files.image.mv('./storage/' + imageid.id + '.' + req.files.image.name.split('.').pop());
+        
+    sharp('./storage/' + imageid.id + '.' + req.files.image.name.split('.').pop())
+    .resize(200, 200, { fit: sharp.fit.inside })
+    .jpeg({ quality: 90 })
+    .toFile('./storage/thumbnail_' + imageid.id + '.jpg')
+    .then(function(){
         for(let tag of req.body.tags.trim().toLowerCase().split(/\s+/)) {
             db.prepare('insert into tags(tag, ref_id) values(?, ?)').run(encodeURIComponent(tag), imageid.id);
         }
-        req.files.image.mv('./storage/' + imageid.id + '.' + req.files.image.name.split('.').pop());
-
-        res.redirect('/view?uid=' + hid.encode(imageid.id));
+        res.redirect('/view?uid=' + hid.encode(imageid.id))
+    }).catch(function() {
+        res.statusCode = 500;
+        res.send(`500: cannot resize image.`);
+        fs.rmSync('./storage/' + imageid.id + '.' + req.files.image.name.split('.').pop());
+        db.prepare(`delete from images where id = ?`).run(imageid.id);
     });
-    transaction.apply();
 });
 app.post('/api/v1/gettags', function(req, res) {
     if(!req.body) {
@@ -125,13 +132,13 @@ app.get('/images', function(req, res) {
         let founddb = db.prepare('select filename, id from images order by id desc limit 28 offset ?').all(page*28);
         maxcount = Math.floor(db.prepare('select count(id) from images').get()['count(id)'] / 28);
         for(let img of founddb) {
-            found.push( { url: '/view?uid=' + hid.encode(img.id), imageurl: '/storage/' + img.filename } );
+            found.push( { url: '/view?uid=' + hid.encode(img.id), imageurl: '/storage/' + img.filename + "?thumbnail=true" } );
         }
     }
     else if(req.query.search.startsWith("uid:")) {
         try {
             let founddb = db.prepare('select filename from images where id = ?').get(hid.decode(req.query.search.substring(4, req.query.search.length)));
-            found.push( { url: '/view?uid=' + req.query.search.substring(4, req.query.search.length), imageurl: '/storage/' + founddb.filename } );
+            found.push( { url: '/view?uid=' + req.query.search.substring(4, req.query.search.length), imageurl: '/storage/' + founddb.filename + "?thumbnail=true" } );
         }
         catch {
             found.push( { url: '/view?uid=notfound', imageurl: '/img/notfound.png' } );
@@ -140,7 +147,7 @@ app.get('/images', function(req, res) {
     else if(req.query.search.startsWith("tag:")) {
         let founddb = db.prepare('select filename, id from images where exists(select ref_id from tags where ref_id == id and tag == ?) and not exists(select ref_id from tags where ref_id == id and tag != ?) order by id desc limit 28 offset ?').all(req.query.search.substring(4, req.query.search.length), req.query.search.substring(4, req.query.search.length), page*28);
         for(let img of founddb) {
-            found.push( {url: 'view?uid=' + hid.encode(img.id), imageurl: '/storage/' + img.filename } );
+            found.push( {url: 'view?uid=' + hid.encode(img.id), imageurl: '/storage/' + img.filename + "?thumbnail=true" } );
         }
         let rawconut = db.prepare('select count(id) from images where exists(select ref_id from tags where ref_id == id and tag == ?) and not exists(select ref_id from tags where ref_id == id and tag != ?)').get(req.query.search.substring(4, req.query.search.length), req.query.search.substring(4, req.query.search.length))['count(id)'] / 28
         if(rawconut == Math.floor(rawconut)) {
@@ -184,7 +191,7 @@ app.get('/images', function(req, res) {
             maxcount = Math.floor(rawconut);
         }
         for(let i of founddb) {
-            found.push( { url: '/view?uid=' + hid.encode(i.id), imageurl: '/storage/' + i.filename } );
+            found.push( { url: '/view?uid=' + hid.encode(i.id), imageurl: '/storage/' + i.filename + "?thumbnail=true" } );
         }
     }
     if(maxcount < 9) {
@@ -227,7 +234,13 @@ app.get('/view', function(req, res) {
     });
 });
 app.get('/storage/:uid', function(req, res) {
-    let fileuid = hid.decode(req.params.uid.slice(0, 25));
+    let fileuid = hid.decode(req.params.uid.split('.')[0]);
+    let prefix = "";
+    let ext = "." + req.params.uid.split('.')[1];
+    if(req.query.thumbnail === "true") {
+        prefix = "thumbnail_";
+        ext = ".jpg";
+    }
     if(fileuid.length === 0) {
         res.render('notfound.hbs', {
             url: req.path
@@ -236,10 +249,10 @@ app.get('/storage/:uid', function(req, res) {
     }
     if(fs.existsSync('./storage/' + fileuid + req.params.uid.substring(25))) {
         res.writeHead(200, {
-            "Content-Type": "image/jpeg",
-            "Content-Disposition": "inline; filename=\"" + req.params.uid.slice(0, 25) + req.params.uid.substring(25) + "\""
+            "Content-Type": "image/" + ext.slice(1),
+            "Content-Disposition": "inline; filename=\"" + prefix + req.params.uid.slice(0, 25) + ext + "\""
         });
-        fs.createReadStream('./storage/' + fileuid + req.params.uid.substring(25)).pipe(res);
+        fs.createReadStream('./storage/' + prefix + fileuid + ext).pipe(res);
         return;
     }
     res.render('notfound.hbs', {

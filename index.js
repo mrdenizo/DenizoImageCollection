@@ -84,22 +84,22 @@ app.post('/api/v1/uploadfile', function(req, res) {
     let imageid = db.prepare(`insert into images default values returning id`).get();
     db.prepare(`update images set filename = ? where id = ?`).run(hid.encode(imageid.id) + '.' + req.files.image.name.split('.').pop(), imageid.id);
         
-    req.files.image.mv('./storage/' + imageid.id + '.' + req.files.image.name.split('.').pop());
-        
-    sharp('./storage/' + imageid.id + '.' + req.files.image.name.split('.').pop())
-    .resize(200, 200, { fit: sharp.fit.inside })
-    .jpeg({ quality: 90 })
-    .toFile('./storage/thumbnail_' + imageid.id + '.jpg')
-    .then(function(){
-        for(let tag of req.body.tags.trim().toLowerCase().split(/\s+/)) {
-            db.prepare('insert into tags(tag, ref_id) values(?, ?)').run(encodeURIComponent(tag), imageid.id);
-        }
-        res.redirect('/view?uid=' + hid.encode(imageid.id))
-    }).catch(function() {
-        res.statusCode = 500;
-        res.send(`500: cannot resize image.`);
-        fs.rmSync('./storage/' + imageid.id + '.' + req.files.image.name.split('.').pop());
-        db.prepare(`delete from images where id = ?`).run(imageid.id);
+    req.files.image.mv('./storage/' + imageid.id + '.' + req.files.image.name.split('.').pop(), function() {
+        sharp('./storage/' + imageid.id + '.' + req.files.image.name.split('.').pop())
+        .resize(200, 200, { fit: sharp.fit.inside })
+        .jpeg({ quality: 90 })
+        .toFile('./storage/thumbnail_' + imageid.id + '.jpg')
+        .then(function() {
+            for(let tag of req.body.tags.trim().toLowerCase().split(/\s+/)) {
+                db.prepare('insert into tags(tag, ref_id) values(?, ?)').run(encodeURIComponent(tag), imageid.id);
+            }
+            res.redirect('/view?uid=' + hid.encode(imageid.id))
+        }).catch(function() {
+            res.statusCode = 500;
+            res.send(`500: cannot resize image.`);
+            fs.rmSync('./storage/' + imageid.id + '.' + req.files.image.name.split('.').pop());
+            db.prepare(`delete from images where id = ?`).run(imageid.id);
+        });
     });
 });
 app.post('/api/v1/gettags', function(req, res) {

@@ -125,6 +125,7 @@ app.get('/images', function(req, res) {
 
     let maxcount = 0;
     let pagebuttons = [];
+    let pagebuttonsmobile = [];
     if(req.query.page)
         page = Number(req.query.page);
 
@@ -210,10 +211,27 @@ app.get('/images', function(req, res) {
         }
     }
 
+    if(maxcount < 5) {
+        for(let i = 0; i < maxcount+1; i++) {
+            pagebuttonsmobile.push( { count: i, isActive: i==page, searchedtext: req.query.search } );
+        }
+    }
+    else if(maxcount < page + 4) {
+        for(let i = 5; i > 1; i--) {
+            pagebuttonsmobile.push( { count: maxcount+2 - i, isActive: maxcount+2-i==page, searchedtext: req.query.search } );
+        }
+    }
+    else {
+        for(let i = 0; i < 5; i++) {
+            pagebuttonsmobile.push( { count: page + i, isActive: page-i==page, searchedtext: req.query.search } );
+        }
+    }
+
     res.render('viewimages.hbs', {
         searchedtext: req.query.search,
         images: found,
         pagebuttons: { isfirst: page < 1, islast: page + 1 > maxcount, last: maxcount, next: page + 1, back: page - 1 },
+        orderedbuttonsmobile: pagebuttonsmobile,
         orderedbuttons: pagebuttons
     });
 });

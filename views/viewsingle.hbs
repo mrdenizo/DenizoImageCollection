@@ -5,11 +5,13 @@
     <link rel="stylesheet" href="./css/autocomplete_posts.css">
     <link rel="stylesheet" href="./css/FontsOverride.css">
     <link rel="stylesheet" href="./css/sidebar.css">
+    <script type="module" src="./js/bootstrap/bootstrap.bundle.min.js" defer></script>
     <script type="module" src="./js/search.js" defer></script>
     <script type="module" src="./js/scaletosize.js" defer></script>
 </head>
 <body>
-    <div class="h-100 d-flex flex-row justify-content-center align-items-center">
+    <div class="h-100 d-flex flex-variative justify-content-center align-items-center">
+        <!--desktop only-->
         <div class="h-100 d-flex flex-column justify-content-start align-items-center p-3 sidebar">
             <h5><a href="/" class="hide">Denizo's image collection</a></h5>
             <form class="d-flex flex-column" method="get" action="/images">
@@ -31,6 +33,40 @@
                 {{/each}}
                 </ul>
             </div>
+        </div>
+        <!--handheld only-->
+        <div class="mobile w-100" style="min-height: 72px;">
+            <nav class="navbar navbar-expand-lg bg-light p-3 fixed-top">
+                <a class="navbar-brand" href="/">Denizo's image collection</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="/searchhelp">Search cheat sheet</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="/upload">Upload an image</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="{{filename}}">View raw image</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Tags</a>
+                            <ul class="dropdown-menu">
+                                {{#each tags}}
+                                    <li><a class="dropdown-item" href="/images?search={{this.tag}}">{{this.tag}}</a></li>
+                                {{/each}}
+                            </ul>
+                        </li>
+                    </ul>
+                    <form class="d-flex flex-row" method="get" action="/images">
+                        <input type="text" name="search" id="search" class="form-control" placeholder="Search..." autocomplete="off" value="{{searchedtext}}">
+                        <button type="submit" class="btn btn-primary mx-2">Search</button>
+                    </form>
+                </div>
+            </nav>
         </div>
         <div class="h-100 d-flex flex-column flex-grow-1">
             <div id="imagecontainer" class="d-flex flex-row flex-grow-1 flex-wrap align-content-start justify-content-start mh-95">

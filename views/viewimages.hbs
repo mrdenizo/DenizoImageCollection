@@ -5,10 +5,12 @@
     <link rel="stylesheet" href="./css/autocomplete_posts.css">
     <link rel="stylesheet" href="./css/FontsOverride.css">
     <link rel="stylesheet" href="./css/sidebar.css">
+    <script type="module" src="./js/bootstrap/bootstrap.bundle.min.js" defer></script>
     <script type="module" src="./js/search.js" defer></script>
 </head>
 <body>
-    <div class="h-100 d-flex flex-row justify-content-center align-items-center">
+    <div class="h-100 d-flex flex-variative justify-content-center align-items-center">
+        <!--desktop only-->
         <div class="h-100 d-flex flex-column justify-content-start align-items-center p-3 sidebar">
             <h5><a href="/" class="hide">Denizo's image collection</a></h5>
             <form class="d-flex flex-column" method="get" action="/images">
@@ -19,14 +21,38 @@
             <a href="/searchhelp">Search cheat sheet</a>
             <a class="mt-2" href="/upload">Upload an image</a>
         </div>
-        <div class="h-100 d-flex flex-column flex-grow-1">
+        <!--handheld only-->
+        <div class="mobile w-100" style="min-height: 144px;">
+            <nav class="navbar navbar-expand-lg bg-light p-3 fixed-top">
+                <a class="navbar-brand" href="/">Denizo's image collection</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="/searchhelp">Search cheat sheet</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="/upload">Upload an image</a>
+                        </li>
+                    </ul>
+                    <form class="d-flex flex-row" method="get" action="/images">
+                        <input type="text" name="search" id="search" class="form-control" placeholder="Search..." autocomplete="off" value="{{searchedtext}}">
+                        <button type="submit" class="btn btn-primary mx-2">Search</button>
+                    </form>
+                </div>
+            </nav>
+        </div>
+        <div class="h-100 d-flex flex-column flex-grow-1 w-100-mobile">
             <div class="d-flex flex-row flex-grow-1 flex-wrap align-content-start justify-content-start">
                 {{#each images}}
-                    <a href="{{this.url}}" class="d-flex justify-content-center align-items-center m-2" style="width: 200px; height: 200px;"><img style="max-width: 200px; max-height: 200px;" src="{{this.imageurl}}"></a>
+                    <a href="{{this.url}}" class="d-flex justify-content-center align-items-center m-2 thumbnail-container"><img class="thumbnail" src="{{this.imageurl}}"></a>
                 {{/each}}
             </div>
             <div class="d-flex align-self-center">
-                <nav aria-label="Page navigation example">
+                <!--desktop pagination only-->
+                <nav class="desktop">
                     <ul class="pagination">
                         <li class="page-item {{#if pagebuttons.isfirst}}disabled{{/if}}"><a class="page-link" href="/images?search={{searchedtext}}&page=0">«</a></li>
                         <li class="page-item {{#if pagebuttons.isfirst}}disabled{{/if}}"><a class="page-link" href="/images?search={{searchedtext}}&page={{pagebuttons.back}}">‹</a></li>
@@ -37,7 +63,20 @@
                         <li class="page-item {{#if pagebuttons.islast}}disabled{{/if}}"><a class="page-link" href="/images?search={{searchedtext}}&page={{pagebuttons.last}}">»</a></li>
                     </ul>
                 </nav>
-                <form method="get" class="d-flex" action="/images">
+                <!--handheld pagination only-->
+                <nav class="mobile">
+                    <ul class="pagination">
+                        <li class="page-item {{#if pagebuttons.isfirst}}disabled{{/if}}"><a class="page-link" href="/images?search={{searchedtext}}&page=0">«</a></li>
+                        <li class="page-item {{#if pagebuttons.isfirst}}disabled{{/if}}"><a class="page-link" href="/images?search={{searchedtext}}&page={{pagebuttons.back}}">‹</a></li>
+                        {{#each orderedbuttonsmobile}}
+                            <li class="page-item"><a class="page-link {{#if this.isActive}}active{{/if}}" href="/images?search={{this.searchedtext}}&page={{this.count}}">{{this.count}}</a></li>
+                        {{/each}}
+                        <li class="page-item {{#if pagebuttons.islast}}disabled{{/if}}"><a class="page-link" href="/images?search={{searchedtext}}&page={{pagebuttons.next}}">›</a></li>
+                        <li class="page-item {{#if pagebuttons.islast}}disabled{{/if}}"><a class="page-link" href="/images?search={{searchedtext}}&page={{pagebuttons.last}}">»</a></li>
+                    </ul>
+                </nav>
+                <!--go to page form desktop only-->
+                <form method="get" class="d-flex desktop" action="/images">
                     <input type="text" name="search" class="d-none" autocomplete="off" value="{{searchedtext}}">
                     <input type="text" name="page" id="page" class="form-control ms-1 me-0" placeholder="page..." autocomplete="off" style="max-width: 75px;">
                     <button type="submit" class="btn btn-primary mx-1">go</button>

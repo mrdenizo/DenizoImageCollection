@@ -22,7 +22,7 @@
             <a class="mt-2" href="/upload">Upload an image</a>
         </div>
         <!--handheld only-->
-        <div class="mobile w-100" style="min-height: 144px;">
+        <div class="mobile w-100" style="min-height: 72px;">
             <nav class="navbar navbar-expand-lg bg-light p-3 fixed-top">
                 <a class="navbar-brand" href="/">Denizo's image collection</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -44,7 +44,7 @@
                 </div>
             </nav>
         </div>
-        <div class="h-100 d-flex flex-column flex-grow-1 w-100-mobile">
+        <div class="h-100 d-flex flex-column flex-grow-1 w-100-mobile overflow-scroll">
             <div class="d-flex flex-row flex-grow-1 flex-wrap align-content-start justify-content-start">
                 {{#each images}}
                     <a href="{{this.url}}" class="d-flex justify-content-center align-items-center m-2 thumbnail-container"><img class="thumbnail" src="{{this.imageurl}}"></a>

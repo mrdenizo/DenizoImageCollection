@@ -18,6 +18,9 @@
         width: 200px;
         height: 200px;
     }
+    .mh-95 {
+        justify-content: start;
+    }
 }
 
 @media only screen and (max-width: 800px)
@@ -41,6 +44,9 @@
     .thumbnail-container{
         width: 190px;
         height: 190px;
+    }
+    .mh-95 {
+        justify-content: center;
     }
 }
 
